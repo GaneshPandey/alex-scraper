@@ -47,12 +47,12 @@ class BonusCashCenter(CrawlSpider):
 
 
     def parse_product(self, response):
-        item = BonusCashCenter()
+        item = Yaging()
         for table in response.xpath('//div[@class="mn_srchListSection"]/ul/li'):
             name            = table.xpath('tr/td[2]/table/tr/td/a/img/@alt').extract()
-            cash_data       = data.xpath('span/text()').extract()
+            cash_data       = table.xpath('span/text()').extract()
             cash           = [cash.split(' ')[0] for cash in cash_data]
-            item['link']    = [self.base_url+link for link in data.xpath('/a[2]/text()').extract()]
+            item['link']    = [self.base_url+link for link in table.xpath('/a[2]/text()').extract()]
             item['name']    = name
             item['cashback'] = cash
             yield item

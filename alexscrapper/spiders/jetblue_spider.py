@@ -50,12 +50,17 @@ class JetblueSpider(CrawlSpider):
             yield Request(url=url, callback=self.parse_product, headers=self.headers)
 
     def parse_product(self, response):
-        item 		= Jetblue()
+        item 		= Yaging()
         pattern 	= ur'([\d.]+)'
         div         = response.xpath('//div[@class="box-cnt"]/div/div/div[@class="merch-full"]')
         for data in div:
-            item['name']        = data.xpath('a/span[2]/text()').extract()[0]
-            item['link']        = [self.base_url + link for link in data.xpath('a/@href').extract()][:][0]
-            item['points']    = data.xpath('a/span[3]/text()').extract()[0].replace('\n', '')
+            name        = str(data.xpath('a/span[2]/text()').extract()[0])
+            link        = str([self.base_url + link for link in data.xpath('a/@href').extract()][:][0])
+            cashback    = str(data.xpath('a/span[3]/text()').extract()[0].replace('\n', ''))
+            item['name']        = name.replace("'", "''")
+            item['link']        = link
+            item['cashback']    = cashback.replace("'", "''")
+            item['sid']         = self.name
+            item['ctype']       = 1
             yield item
     

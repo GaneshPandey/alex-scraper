@@ -55,7 +55,7 @@ class YangingSpider(CrawlSpider):
             item['name']        = name.replace("'", "''")
             item['link']        = link
             item['cashback']    = cashback.replace("'", "''")
-            item['sid']         = self.name #+ "_"+ str(self.i)
+            item['sid']         = self.name
             item['ctype']       = 1
             yield item
 

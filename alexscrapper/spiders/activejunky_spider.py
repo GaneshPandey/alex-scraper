@@ -57,14 +57,19 @@ class ActivejunkySpider(CrawlSpider):
 
 
     def parse_product(self, response):
-        item = ActiveJunky()
-    	for sel in response.xpath('//article[@class="store"]'):
-    		_name = sel.xpath('a/@href').extract()
-    		_name =  [name.split('/')[-1] for name in _name]
-    		_cash = sel.xpath('a/strong/text()').extract()
-    		_cash = [cash.split(' ')[-3] for cash in _cash]
-    		item['link'] =  [self.base_url+link for link in sel.xpath('a/@href').extract()]
-    		item['name']  = [name.replace("-"," ") for name in _name]
-    		item['cashback'] = _cash
-    		yield item
+        item = Yaging()
+        for sel in response.xpath('//article[@class="store"]'):
+            _name = sel.xpath('a/@href').extract()
+            _name =  [name.split('/')[-1] for name in _name]
+            _cash = sel.xpath('a/strong/text()').extract()
+            _cash = [cash.split(' ')[-3] for cash in _cash]
+            link =  [self.base_url+link for link in sel.xpath('a/@href').extract()][0]
+            name  = [name.replace("-"," ") for name in _name][0]
+            cashback = _cash[0]
+            item['name']        = name.replace("'", "''")
+            item['link']        = link
+            item['cashback']    = cashback.replace("'", "''")
+            item['sid']         = self.name
+            item['ctype']       = 1
+            yield item
             

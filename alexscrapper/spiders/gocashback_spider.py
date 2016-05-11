@@ -47,14 +47,16 @@ class GoCashBackSpider(CrawlSpider):
             yield Request(url=url, callback=self.parse_product, headers=self.headers)
 
     def parse_product(self, response):
-        item = GoCashBack()
+        item = Yaging()
         stores = response.xpath('//div[@class="top clearfix"]')
 
         for data in stores:
-            name = data.xpath('div[@class="right"]/a/text()').extract()
-            cash = data.xpath('div[@class="left"]/p/text()').extract()
-            item['link'] =  [self.base_url+link for link in data.xpath('div[@class="left"]/a/@href').extract()]
-            item['name']  = name
-            pattern = r'([\d.]+)'
-            item['cashback'] = [re.findall(pattern, c) for c in cash][:][0]
+            name = data.xpath('div[@class="right"]/a/text()').extract()[0].encode('utf-8')
+            cashback = data.xpath('div[@class="left"]/p/text()').extract()[0]
+            link =  [self.base_url+link for link in data.xpath('div[@class="left"]/a/@href').extract()][0]
+            item['name']        = name.replace("'", "''")
+            item['link']        = link
+            item['cashback']    = cashback.replace("'", "''")
+            item['sid']         = self.name
+            item['ctype']       = 1
             yield item

@@ -46,12 +46,17 @@ class ShopAtHomeSpider(CrawlSpider):
             yield Request(url=url, callback=self.parse_product, headers=self.headers)
 
     def parse_product(self, response):
-        item 		= ShopAtHome()
+        item 		= Yaging()
         pattern 	= ur'([\d.]+)'
         table 		= response.xpath('//table')
         tr 			= table.xpath('tbody/tr')
         for data in tr:
-            item['name']        =  data.xpath('td[2]/a/text()').extract()
-            item['link']        =  [link for link in data.xpath('td[2]/a/@href').extract()]
-            item['cashback']    =  data.xpath('td[4]/div/div/span/text()').extract()
+            name        =  data.xpath('td[2]/a/text()').extract()[0]
+            link        =  [link for link in data.xpath('td[2]/a/@href').extract()][0]
+            cashback    =  data.xpath('td[4]/div/div/span/text()').extract()[0]
+            item['name']        = name.replace("'", "''")
+            item['link']        = link
+            item['cashback']    = cashback.replace("'", "''")
+            item['sid']         = self.name
+            item['ctype']       = 1
             yield item

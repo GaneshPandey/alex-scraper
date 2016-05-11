@@ -48,7 +48,7 @@ class ExtrarebatesSpider(CrawlSpider):
 
 
     def parse_product(self, response):
-        item = Extrarebates()
+        item = Yaging()
         table = response.xpath('/html/body/table/tr/td/table[3]/tr/td[2]/table')
         
         td1_name = table.xpath('tr/td[@class=" row1"][2]')
@@ -64,12 +64,18 @@ class ExtrarebatesSpider(CrawlSpider):
         td_link = td1_link + td2_link
 
         for x in xrange(1,len(td_cash)):
-            name            = td_name[x].xpath('span/a/b/text()').extract()
-            link            = td_name[x].xpath('span/a/@href').extract()
-            cash_data       = td_cash[x].xpath('span/b/text()').extract()
-            item['name']    = name
-            item['cashback'] = cash_data
-            item['link']    = self.base_url + "/" + link[0]
+            name            = td_name[x].xpath('span/a/b/text()').extract_first()
+            link            = self.base_url + "/" +  td_name[x].xpath('span/a/@href').extract_first()
+            cashback        = td_cash[x].xpath('span/b/text()').extract_first()
+            if not cashback:
+                item['cashback'] = "--"
+            else:
+                item['cashback']    = cashback.replace("'", "''")
+
+            item['name']        = name.replace("'", "''")
+            item['link']        = link
+            item['sid']         = self.name
+            item['ctype']       = 1
             yield item
 
 

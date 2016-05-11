@@ -43,12 +43,18 @@ class BarclayCardRewardsboostSpider(CrawlSpider):
             yield Request(url=url, callback=self.parse_product, headers=self.headers)
 
     def parse_product(self, response):
-        item 		= BarclayCardRewardsboost()
+        item 		= Yaging()
         pattern 	= ur'([\d.]+)'
         div = response.xpath('//div[@class="mn_sectCont"]')[6]
         li  = div.xpath('div[@class="mn_contItem"]/div[@class="mn_srchListSection"]/ul/li')
         for data in li:
-            item['name']        = data.xpath('a/text()').extract()[0]
-            item['link']        = [self.base_url + data.xpath('a[2]/@href').extract()[0]][0].replace('..', '')
-            item['points']       = data.xpath('span/text()').extract()[0].replace(u'\xa0', ' ')
+            name       = data.xpath('a/text()').extract()[0]
+            link       = [self.base_url + data.xpath('a[2]/@href').extract()[0]][0].replace('..', '')
+            cashback     = data.xpath('span/text()').extract()[0].replace(u'\xa0', ' ')
+            item['name']        = name.replace("'", "''")
+            item['link']        = link
+            item['cashback']    = cashback.replace("'", "''")
+            item['sid']         = self.name
+            item['ctype']       = 1
+
             yield item

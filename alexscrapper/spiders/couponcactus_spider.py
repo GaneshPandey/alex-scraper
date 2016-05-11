@@ -47,14 +47,17 @@ class CouponCactus(CrawlSpider):
 
 
     def parse_product(self, response):
-        item = AlexscrapperItem()
-        for data in response.xpath('//*[@id="by-store"]/div/table/tr'):
-            name            = data.xpath('td/a/text()').extract()
-            cash_data       = data.xpath('td[2]/text()').extract()
+        tr = response.xpath('//*[@id="by-store"]/div/table/tr')
+        item = Yaging()
+        for data in tr:
+            name            = data.xpath('td/a/text()').extract_first()
+            cash_data       = data.xpath('td[2]/text()').extract_first()
             if name:
                 if cash_data:
-                    item['link']    = [self.base_url+link for link in data.xpath('td/a/@href').extract()]
-                    item['name']    = name
-                    item['cashback'] = cash_data
+                    item['link']    = self.base_url + data.xpath('td/a/@href').extract_first()
+                    item['name']    = name.replace("'", "''")
+                    item['cashback'] = cash_data.replace("'", "''")
+                    item['sid']         = self.name
+                    item['ctype']       = 1
                     
             yield item

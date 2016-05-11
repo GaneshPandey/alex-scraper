@@ -50,15 +50,18 @@ class MrRebatesSpider(CrawlSpider):
             yield Request(url=url, callback=self.parse_product, headers=self.headers)
 
     def parse_product(self, response):
-        item = MrRebates()
+        item = Yaging()
         pattern = ur'([\d.]+)'
         table = response.xpath('//center/table')
         tr = table.xpath('tr[@class="odd" or @class="even"]')
 
         for data in tr:
-            name = data.xpath('td/a/b/text()').extract()
-            cashback = data.xpath('td[3]/text()').extract()
-            item['name'] = name
-            item['link'] =  [self.base_url + link for link in data.xpath('td/a/@href').extract()][:][0]
-            item['cashback'] = cashback
+            name        = str(data.xpath('td/a/b/text()').extract()[0])
+            link        = str([self.base_url + link for link in data.xpath('td/a/@href').extract()][:][0])
+            cashback    = str(data.xpath('td[3]/text()').extract()[0])  
+            item['name']        = name.replace("'", "''")
+            item['link']        = link
+            item['cashback']    = cashback.replace("'", "''")
+            item['sid']         = self.name
+            item['ctype']       = 1
             yield item

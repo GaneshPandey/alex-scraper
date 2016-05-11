@@ -51,11 +51,16 @@ class FlyStoreSpider(CrawlSpider):
             yield Request(url=url, callback=self.parse_product, headers=self.headers)
 
     def parse_product(self, response):
-        item 		= FlyStore()
+        item 		= Yaging()
         pattern 	= ur'([\d.]+)'
         div = response.xpath('//div[@class="merch-list"]/div/div[@class="col-md-2 col-sm-4 col-xs-6 merch-wrapper"]/div/div[2]')
         for data in div:
-            item['name']        = data.xpath('a/span[2]/text()').extract()[0]
-            item['link']        = [self.base_url + data.xpath('a/@href').extract()[0]][0]
-            item['points']       = data.xpath('a/span[3]/text()').extract()[0]
+            name        = data.xpath('a/span[2]/@title').extract_first().encode('utf-8')
+            link        = [self.base_url + data.xpath('a/@href').extract()[0]][0]
+            cashback    = data.xpath('a/span[3]/text()').extract()[0]
+            item['name']        = name.replace("'", "''")
+            item['link']        = link
+            item['cashback']    = cashback.replace("'", "''")
+            item['sid']         = self.name
+            item['ctype']       = 1
             yield item

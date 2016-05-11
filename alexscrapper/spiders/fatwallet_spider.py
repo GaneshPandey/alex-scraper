@@ -23,7 +23,7 @@ class FatwalletSpider(CrawlSpider):
 
     allowed_domains = ["fatwallet.com"]
 
-    start_urls =    ['https://www.fatwallet.com/cash-back-shopping/']
+    start_urls =    ['https://www.fatwallet.com/deals/stores/']
 
     base_url = 'https://www.fatwallet.com'
 
@@ -46,21 +46,19 @@ class FatwalletSpider(CrawlSpider):
             yield Request(url=url, callback=self.parse_product, headers=self.headers)
 
     def parse_product(self, response):
-        item = FatWallet()
+        item = Yaging()
         table = response.xpath('//div/table[@class="storeList"]')
         tr1 = table.xpath('tbody/tr[@class="storeListRow"]')
         tr2 = table.xpath('tbody/tr[@class="storeListRow even"]')
         tr = tr1 + tr2
 
         for data in tr:
-            name = data.xpath('td/a/span/span/text()').extract()
-            cashback = data.xpath('td/span[@class="cash-back"]/div/text()').extract()
-
-            item['link'] =  [self.base_url+link for link in data.xpath('td/a/@href').extract()]
-            item['name']  = name
-            pattern = r'([\d.]+)'
-            item['cashback'] = [re.findall(pattern, c) for c in cashback][:][0]
+            name        = data.xpath('td/a/span/span/text()').extract_first().encode('utf-8')
+            cashback    = data.xpath('td[3]/div/span/text()').extract_first()
+            link        =  self.base_url+ data.xpath('td/a/@href').extract_first()
+            item['name']        = name.replace("'", "''")
+            item['link']        = link
+            item['cashback']    = cashback.replace("'", "''")
+            item['sid']         = self.name
+            item['ctype']       = 1
             yield item
-
-
-

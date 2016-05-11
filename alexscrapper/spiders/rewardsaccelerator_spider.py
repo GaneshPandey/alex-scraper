@@ -47,12 +47,18 @@ class RewardsAcceleratorSpider(CrawlSpider):
             yield Request(url=url, callback=self.parse_product, headers=self.headers)
 
     def parse_product(self, response):
-        item 		= RewardsAccelerator()
+        item 		= Yaging()
         pattern 	= ur'([\d.]+)'
         j           = json.loads(response.body)
 
         for x in xrange(1,len(j['data']['records'])):
-            item['name']        = j['data']['records'][x]['merchantName']
-            item['link']        = j['data']['records'][x]['domain']
-            item['cashback']    =  j['data']['records'][x]['awardMessage']
+            name        = j['data']['records'][x]['merchantName']
+            link        = j['data']['records'][x]['domain']
+            cashback    =  j['data']['records'][x]['awardMessage']
+            item['name']        = name.replace("'", "''")
+            item['link']        = link
+            item['cashback']    = cashback.replace("'", "''")
+            item['sid']         = self.name
+            item['ctype']       = 1
+
             yield item

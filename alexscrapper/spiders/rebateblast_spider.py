@@ -19,7 +19,7 @@ import requests
 
 
 class RebateBlastSpider(CrawlSpider):
-    name = "rebateblast"
+    name = "RebateBlast"
 
     allowed_domains = ["rebateblast.com"]
 
@@ -49,14 +49,18 @@ class RebateBlastSpider(CrawlSpider):
             yield Request(url=url, callback=self.parse_product, headers=self.headers)
 
     def parse_product(self, response):
-        item 		= RebateBlast()
+        item 		= Yaging()
         pattern 	= ur'([\d.]+)'
         table 		= response.xpath('//div[@class="box-m"]/table')
         tr 			= table.xpath('tbody/tr')
 
         for data in tr:
-            name = data.xpath('th/a/text()').extract()
-            item['name'] = name
-            item['link'] =  [link for link in data.xpath('th/a/@href').extract()]
-            item['cashback'] = [ c.replace(u'up\xa0to\xa0', u'') for c in data.xpath('td[3]/strong/text()').extract()]
+            name = str(data.xpath('th/a/text()').extract()[0])
+            link =  str([link for link in data.xpath('th/a/@href').extract()][0])
+            cashback = str([ c.replace(u'up\xa0to\xa0', u'') for c in data.xpath('td[3]/strong/text()').extract()][0])
+            item['name']        = name.replace("'", "''")
+            item['link']        = link
+            item['cashback']    = cashback.replace("'", "''")
+            item['sid']         = self.name
+            item['ctype']       = 1
             yield item

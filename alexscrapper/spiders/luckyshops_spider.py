@@ -47,16 +47,20 @@ class LuckyshopsSider(CrawlSpider):
             yield Request(url=url, callback=self.parse_product, headers=self.headers)
 
     def parse_product(self, response):
-        item = Iconsumer()
+        item = Yaging()
         pattern = ur'([\d.]+)'
         store = response.xpath('//ul[@class="mn_splitListRt" or @class="mn_splitListLt"]/li')
 
         for data in store:
-            name = data.xpath('a[2]/text()').extract()
-            cashback = data.xpath('span').extract()
-            item['name'] = name
-            item['link'] =  [(self.base_url + self.parse_link(link)) for link in data.xpath('a/@href').extract()][:][1]
-            item['cashback'] = [re.findall(pattern, c) for c in cashback][:][0]
+            name        = str(data.xpath('a[2]/text()').extract()[0])
+            cashback    = str(data.xpath('span').extract()[0])
+            link        = str([(self.base_url + self.parse_link(link)) for link in data.xpath('a/@href').extract()][:][1])
+            item['name']        = name.replace("'", "''")
+            item['link']        = link
+            cashback            = cashback.replace("<span>", "").replace("</span>", "")
+            item['cashback']    = cashback.replace("'", "''")
+            item['sid']         = self.name
+            item['ctype']       = 1
             yield item
 
 

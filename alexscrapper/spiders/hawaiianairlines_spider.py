@@ -53,14 +53,16 @@ class HawaiiAnairLinesSpider(CrawlSpider):
             yield Request(url=url, callback=self.parse_product, headers=self.headers)
 
     def parse_product(self, response):
-        item 		= HawaiiAnairLines()
+        item 		= Yaging()
         j           = json.loads(response.body)
         
         for x in xrange(1,len(j['bs'])):
             name        = j['bs'][x]['n']
-            domain      = j['bs'][x]['d']
-            miles       = str(j['bs'][x]['c']) + " miles per " + str(j['bs'][x]['xs']) + j['bs'][x]['ct']
-            item['name']    = name
-            item['link']    = domain
-            item['miles']   = miles
+            link      = j['bs'][x]['d']
+            cashback       = str(j['bs'][x]['c']) + " miles per " + str(j['bs'][x]['xs']) + j['bs'][x]['ct']
+            item['name']        = name.replace("'", "''")
+            item['link']        = link
+            item['cashback']    = cashback.replace("'", "''")
+            item['sid']         = self.name
+            item['ctype']       = 1
             yield item

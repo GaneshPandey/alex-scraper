@@ -47,16 +47,19 @@ class IconsumerSpider(CrawlSpider):
             yield Request(url=url, callback=self.parse_product, headers=self.headers)
 
     def parse_product(self, response):
-        item = Iconsumer()
+        item = Yaging()
         pattern = ur'([\d.]+)'
         store = response.xpath('//div[@class="inner4_blk2"]/ul/li')
 
         for data in store:
-            name = data.xpath('div/a/text()').extract()
-            cashback = data.xpath('a[2]/small/text()').extract()
-            item['name'] = name
-            item['link'] =  [self.parse_link(link) for link in data.xpath('a[2]/@onclick').extract()]
-            item['cashback'] = [re.findall(pattern, c) for c in cashback][:][0]
+            name    = str(data.xpath('div/a/text()').extract()[0])
+            link    = str([self.parse_link(link) for link in data.xpath('a[2]/@onclick').extract()][0])
+            cashback = str(data.xpath('a[2]/small/text()').extract()[0])
+            item['name']        = name.replace("'", "''")
+            item['link']        = link
+            item['cashback']    = cashback.replace("'", "''")
+            item['sid']         = self.name
+            item['ctype']       = 1
             yield item
 
 

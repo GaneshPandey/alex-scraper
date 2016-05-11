@@ -46,13 +46,18 @@ class HhonorsSpider(CrawlSpider):
             yield Request(url=url, callback=self.parse_product, headers=self.headers)
 
     def parse_product(self, response):
-        item 		= Hhonors()
+        item 		= Yaging()
         pattern 	= ur'([\d.]+)'
         tr 			= response.xpath('//div[@class="all-merchant-list"]/div[@class="content-item"]/table/tr')
         for data in tr:
-            item['name']        = data.xpath('td[@class="info"]/div/span/a/text()').extract()[:][0]
-            item['link']        = data.xpath('td[@class="merchant-icon"]/table/tr/td/a/@href').extract()[:][0]
-            item['miles']    	= [ self.url_clean(m) for m in data.xpath('td[@class="point-info"]/div[@class="new-point"]/text()').extract()][:][0]
+            name        = data.xpath('td[@class="info"]/div/span/a/text()').extract()[:][0].encode('utf-8')
+            link        = str(data.xpath('td[@class="merchant-icon"]/table/tr/td/a/@href').extract()[:][0])
+            cashback    = str([ self.url_clean(m) for m in data.xpath('td[@class="point-info"]/div[@class="new-point"]/text()').extract()][:][0])
+            item['name']        = name.replace("'", "''")
+            item['link']        = link
+            item['cashback']    = cashback.replace("'", "''")
+            item['sid']         = self.name
+            item['ctype']       = 1
             yield item
 
     def url_clean(self, data):

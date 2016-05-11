@@ -19,7 +19,7 @@ from lxml import html
 
 
 class AmtrakGuestRewardsSpider(CrawlSpider):
-    name = "amtrakguestrewards"
+    name = "amtrakGuestRewards"
 
     allowed_domains = ["amtrakguestrewards.com"]
 
@@ -55,12 +55,17 @@ class AmtrakGuestRewardsSpider(CrawlSpider):
             yield Request(url=url, callback=self.parse_product, headers=self.headers)
 
     def parse_product(self, response):
-        item 		= AmtrakGuestRewards()
+        item 		= Yaging()
         pattern 	= ur'([\d.]+)'
         div         = response.xpath('//*[@id="category"]/div[3]/div/div/div[@class="merch-full"]')
         for data in div:
-            item['name']        = data.xpath('a/span[2]/text()').extract()[0]
-            item['link']        = [self.base_url + link for link in data.xpath('a/@href').extract()][:][0]
-            item['cashback']    = data.xpath('a/span[3]/text()').extract()[0]
+            name        = data.xpath('a/span[2]/text()').extract()[0]
+            link        = [self.base_url + link for link in data.xpath('a/@href').extract()][:][0]
+            cashback    = data.xpath('a/span[3]/text()').extract()[0]
+            item['name']        = name.replace("'", "''")
+            item['link']        = link
+            item['cashback']    = cashback.replace("'", "''")
+            item['sid']         = self.name
+            item['ctype']       = 1
             yield item
     

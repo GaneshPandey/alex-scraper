@@ -50,14 +50,17 @@ class MainStreetSharesSpider(CrawlSpider):
             yield Request(url=url, callback=self.parse_product, headers=self.headers)
 
     def parse_product(self, response):
-        item = MainStreetShares()
+        item = Yaging()
         pattern = ur'([\d.]+)'
         store = response.xpath('//table/tbody/tr')
 
         for data in store:
-            name = data.xpath('td[2]/a/text()').extract()
-            cashback = data.xpath('td/strong/text()').extract()
-            item['name'] = name
-            item['link'] =  [self.base_url + link for link in data.xpath('td[2]/a/@href').extract()]
-            item['cashback'] = [re.findall(pattern, c) for c in cashback][:][0]
+            name = str(data.xpath('td[2]/a/text()').extract()[0])
+            cashback = str(data.xpath('td/strong/text()').extract()[0])
+            link = str([self.base_url + link for link in data.xpath('td[2]/a/@href').extract()][0])
+            item['name']        = name.replace("'", "''")
+            item['link']        = link
+            item['cashback']    = cashback.replace("'", "''")
+            item['sid']         = self.name
+            item['ctype']       = 1
             yield item

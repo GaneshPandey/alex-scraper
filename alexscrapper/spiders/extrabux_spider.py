@@ -49,7 +49,7 @@ class ExtraBuxSpider(CrawlSpider):
             yield Request(url=url, callback=self.parse_product, headers=self.headers)
 
     def parse_product(self, response):
-        item = ExtraBux()
+        item = Yaging()
         stores = response.xpath('//div[@class="store"]')
 
         for data in stores:
@@ -60,8 +60,10 @@ class ExtraBuxSpider(CrawlSpider):
                 clean_name.append(st[0:pos-1].lstrip())
 
             cash = data.xpath('div[@class="linkContainer"]/a[@class="cashBack transferLink"]/text()').extract()
-            item['link'] =  [self.base_url+link for link in data.xpath('a/@href').extract()]
-            item['name']  = clean_name
+            item['link'] =  [self.base_url+link for link in data.xpath('a/@href').extract()][0]
+            item['name']  = clean_name[0].replace("'", "''")
             pattern = r'([\d.]+)'
-            item['cashback'] = [re.findall(pattern, c) for c in cash]
+            item['cashback'] = [re.findall(pattern, c) for c in cash][0][0].replace("'", "''")
+            item['sid']         = self.name
+            item['ctype']       = 1
             yield item

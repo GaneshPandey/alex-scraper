@@ -43,12 +43,17 @@ class RewardsSpider(CrawlSpider):
             yield Request(url=url, callback=self.parse_product, headers=self.headers)
 
     def parse_product(self, response):
-        item 		= Rewards()
+        item 		= Yaging()
         pattern 	= ur'([\d.]+)'
         div         = response.xpath('//div[@class="merchant-container-list"]')
         for data in div:
-            item['name']        = data.xpath('div[@class="merchant-name"]/div/a/text()').extract()[:][0]
-            item['link']        = [self.base_url + link for link in data.xpath('div[@class="merchant-name"]/div/a/@href').extract()][:][0]
-            item['points']      = data.xpath('div[@class="merchant-cashback"]/div/text()').extract()[0].replace('\n', '').replace('\t', '').replace('\r', '')
+            name        = data.xpath('div[@class="merchant-name"]/div/a/text()').extract()[:][0]
+            link        = [self.base_url + link for link in data.xpath('div[@class="merchant-name"]/div/a/@href').extract()][:][0]
+            cashback      = data.xpath('div[@class="merchant-cashback"]/div/text()').extract()[0].replace('\n', '').replace('\t', '').replace('\r', '')
+            item['name']        = name.replace("'", "''")
+            item['link']        = link
+            item['cashback']    = cashback.replace("'", "''")
+            item['sid']         = self.name
+            item['ctype']       = 1
             yield item
     

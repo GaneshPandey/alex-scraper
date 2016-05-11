@@ -46,18 +46,20 @@ class GivingAssistantSpider(CrawlSpider):
             yield Request(url=url, callback=self.parse_product, headers=self.headers)
 
     def parse_product(self, response):
-        item = GivingAssistant()
+        item = Yaging()
         store = response.xpath('//div[@class="span10"]')[1]
         datas = store.xpath('div/p')
 
         for data in datas:
-            name = data.xpath('a/text()').extract()
-            cashback = data.xpath('text()').extract()
-            pattern = r'([\d.]+)'
+            name        = data.xpath('a/text()').extract_first()
+            cashback    = data.xpath('text()').extract_first()
+            link        =  self.base_url+ data.xpath('a/@href').extract_first()
+            item['name']        = name.replace("'", "''")
+            item['link']        = link
+            item['cashback']    = cashback.replace("'", "''")
+            item['sid']         = self.name
+            item['ctype']       = 1
 
-            item['link'] =  [self.base_url+link for link in data.xpath('a/@href').extract()]
-            item['name']  = name
-            item['cashback'] = [re.findall(pattern, c) for c in cashback][:][0]
             yield item
 
 

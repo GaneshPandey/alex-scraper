@@ -47,15 +47,17 @@ class HooplaDooplaSpider(CrawlSpider):
             yield Request(url=url, callback=self.parse_product, headers=self.headers)
 
     def parse_product(self, response):
-    	#print response.body
-        item = HooplaDoopla()
+        item = Yaging()
         pattern = ur'([\d.]+)'
         store = response.xpath('//div[@id="merchantlisting"]')
 
         for data in store:
-        	name = data.xpath('table/tbody/tr/td[1]/a/text()').extract()
-        	cashback = data.xpath('table/tbody/tr/td[2]/text()').extract()
-        	item['name'] = name
-        	item['link'] =  [self.base_url+link for link in data.xpath('table/tbody/tr/td[1]/a/@href').extract()]
-        	item['cashback'] = [re.findall(pattern, c) for c in cashback][:][0]
-        	yield item
+            name = str(data.xpath('table/tbody/tr/td[1]/a/text()').extract()[0])
+            cashback = str(data.xpath('table/tbody/tr/td[2]/text()').extract()[0])
+            link =  str([self.base_url+link for link in data.xpath('table/tbody/tr/td[1]/a/@href').extract()][0])
+            item['name']        = name.replace("'", "''")
+            item['link']        = link
+            item['cashback']    = cashback.replace("'", "''")
+            item['sid']         = self.name
+            item['ctype']       = 1
+            yield item
