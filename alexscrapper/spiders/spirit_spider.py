@@ -51,11 +51,16 @@ class SpiritSpider(CrawlSpider):
             yield Request(url=url, callback=self.parse_product, headers=self.headers)
 
     def parse_product(self, response):
-        item 		= Spirit()
+        item 		= Yaging()
         pattern 	= ur'([\d.]+)'
         div         = response.xpath('//*[@id="category"]/div/div[3]/div/div/div')
         for data in div:
-            item['name']        = data.xpath('div/div[@class="merch-full"]/a/span[2]/text()').extract()[0]
-            item['link']        = [self.base_url + data.xpath('div/div[@class="merch-full"]/a/@href').extract()[0]][0]
-            item['miles']    = data.xpath('div/div[@class="merch-full"]/a/span[3]/text()').extract()[0]
+            name    = str(data.xpath('div/div[@class="merch-full"]/a/span[2]/text()').extract()[0])
+            link    = str([self.base_url + data.xpath('div/div[@class="merch-full"]/a/@href').extract()[0]][0])
+            cashback = data.xpath('div/div[@class="merch-full"]/a/span[3]/text()').extract()[0]
+            item['name']        = name.replace("'", "''")
+            item['link']        = link
+            item['cashback']    = cashback.replace("'", "''")
+            item['sid']         = self.name
+            item['ctype']       = 2
             yield item

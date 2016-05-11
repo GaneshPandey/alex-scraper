@@ -14,7 +14,7 @@ from scrapy.http import Request
 class MySQLStorePipeline(object):
 	"""docstring for MySQLStorePipeline"""
 	def __init__(self):
-		self.conn = MySQLdb.connect("localhost", "scrapy", "Noones123", "alexspider")
+		self.conn = MySQLdb.connect("127.0.0.1", "scrapy", "Noones123", "alexspider")
 		self.cursor = self.conn.cursor()
 
 
