@@ -55,7 +55,7 @@ class CouponCactus(CrawlSpider):
             if name:
                 if cash_data:
                     item['link']    = self.base_url + data.xpath('td/a/@href').extract_first()
-                    item['name']    = name.replace("'", "''")
+                    item['name']    = name.replace("'", "''").replace("coupons", "")
                     item['cashback'] = cash_data.replace("'", "''")
                     item['sid']         = self.name
                     item['ctype']       = 1
