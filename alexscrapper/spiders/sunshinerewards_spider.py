@@ -61,4 +61,6 @@ class SunshineRewardsSpider(CrawlSpider):
             item['link']    = link
             item['cashback']=  cashback
             yield item
+
+            # ctype = 1
     

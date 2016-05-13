@@ -58,4 +58,4 @@ class SplenderSpider(CrawlSpider):
             item['link']        = [self.base_url + link for link in data.xpath('merchant-page-link/a/@ng-href').extract()]
             item['cashback']    = data.xpath('merchant-page-link/a/div[2]/text()').extract()
             yield item
-    
+    # ctype = 1

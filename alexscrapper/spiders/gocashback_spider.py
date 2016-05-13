@@ -42,7 +42,7 @@ class GoCashBackSpider(CrawlSpider):
         settings.set('USER_AGENT', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.90 Safari/537.36')
 
     def start_requests(self):
-        for x in xrange(1,84):
+        for x in xrange(1,6):
             url = "http://www.gocashback.com/stores?p=" + str(x)
             yield Request(url=url, callback=self.parse_product, headers=self.headers)
 
@@ -56,7 +56,17 @@ class GoCashBackSpider(CrawlSpider):
             link =  [self.base_url+link for link in data.xpath('div[@class="left"]/a/@href').extract()][0]
             item['name']        = name.replace("'", "''")
             item['link']        = link
-            item['cashback']    = cashback.replace("'", "''")
+            item['cashback']    = self.getCleanName(cashback).replace("'", "''")
             item['sid']         = self.name
             item['ctype']       = 1
             yield item
+
+
+    def getCleanName(self, s):        
+        return s.replace('\\u00a0', ' ')
+
+    def getCleanCashback(self, cashback):
+        return cashback
+
+
+

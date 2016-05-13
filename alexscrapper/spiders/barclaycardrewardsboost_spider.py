@@ -55,6 +55,6 @@ class BarclayCardRewardsboostSpider(CrawlSpider):
             item['link']        = link
             item['cashback']    = cashback.replace("'", "''")
             item['sid']         = self.name
-            item['ctype']       = 1
+            item['ctype']       = 3
 
             yield item

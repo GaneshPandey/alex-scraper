@@ -43,7 +43,7 @@ class SouthwestSpider(CrawlSpider):
             yield Request(url=url, callback=self.parse_product, headers=self.headers)
 
     def parse_product(self, response):
-        item 		= Southwest()
+        item 		= Yaging()
         pattern 	= ur'([\d.]+)'
         div         = response.xpath('//div[@class="merchant-container-list"]')
         for data in div:
@@ -52,3 +52,4 @@ class SouthwestSpider(CrawlSpider):
             item['points']      = data.xpath('div[@class="merchant-cashback"]/div/text()').extract()[0].replace('\n', '').replace('\t', '').replace('\r', '')
             yield item
     
+    # ctype =2

@@ -49,7 +49,7 @@ class DiscoverSpider(CrawlSpider):
 
 
     def parse_product(self, response):
-        item = Discover()
+        item = Yaging()
         datas = self.get_html(self.start_urls[0])
         for data in datas.xpath('//div[@class="mn_srchListSection"]/ul/li'):
             name            = data.xpath('a[2]/text()').extract()

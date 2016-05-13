@@ -22,6 +22,8 @@ class MySQLStorePipeline(object):
 		try:
 			sql = """INSERT INTO `noones` (`s_id`, `name`, `link`, `cashback`, `ctype`) VALUES ("""+ "'"+item['sid'].encode('utf-8')+ "'," +"'"+item['name'].encode('utf-8')+ "'," +"'"+item['link'].encode('utf-8')+ "'," +"'"+item['cashback'].encode('utf-8') +"'," +"'"+str(item['ctype'])	+"'"+""")"""
 			print sql
+			# sql = """INSERT INTO `noones` (`quote`, `author`, `image`) VALUES ("""+ "'"+item['quote'].encode('utf-8')+ "'," +"'"+item['author'].encode('utf-8')+ "'," +"'"+item['image'].encode('utf-8')+"'"+""")""
+
 
 			self.cursor.execute(sql)
 			self.conn.commit()

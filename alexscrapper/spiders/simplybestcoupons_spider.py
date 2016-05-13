@@ -54,3 +54,5 @@ class SimplyBestCouponsSpider(CrawlSpider):
             item['link']        =  [self.base_url + link for link in data.xpath('a/@href').extract()]
             item['cashback']    =  data.xpath('span/text()').extract()
             yield item
+
+# ctype =1

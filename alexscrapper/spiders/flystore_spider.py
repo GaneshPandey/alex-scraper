@@ -62,5 +62,5 @@ class FlyStoreSpider(CrawlSpider):
             item['link']        = link
             item['cashback']    = cashback.replace("'", "''")
             item['sid']         = self.name
-            item['ctype']       = 1
+            item['ctype']       = 2
             yield item
