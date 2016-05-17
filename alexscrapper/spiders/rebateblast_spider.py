@@ -19,6 +19,7 @@ import requests
 
 
 class RebateBlastSpider(CrawlSpider):
+    store_name = "Rebate Blast"
     name = "RebateBlast"
 
     allowed_domains = ["rebateblast.com"]
@@ -61,6 +62,12 @@ class RebateBlastSpider(CrawlSpider):
             item['name']        = name.replace("'", "''")
             item['link']        = link
             item['cashback']    = cashback.replace("'", "''")
-            item['sid']         = self.name
+            item['sid']         = self.store_name
             item['ctype']       = 1
+            item['numbers']     = self.getNumbers(cashback).replace('%', '').replace('$', '')
             yield item
+
+    def getNumbers(self, cashback):
+        cash = cashback
+        pattern = r'\d+(?:\.\d+)?%|\$\d+(?:\.\d+)?'
+        return re.findall(pattern, cash)[0]

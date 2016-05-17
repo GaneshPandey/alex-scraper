@@ -18,6 +18,7 @@ import requests
 
 
 class SplenderSpider(CrawlSpider):
+    store_name = "Splender"
     name = "splender"
 
     allowed_domains = ["splender.com"]

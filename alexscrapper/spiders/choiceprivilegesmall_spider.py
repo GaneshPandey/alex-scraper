@@ -19,6 +19,7 @@ from lxml import html
 
 
 class ChoicePrivilegeSmallSpider(CrawlSpider):
+    store_name = "Choice Privilege Small"
     name = "choiceprivilegesmall"
     allowed_domains = ["choiceprivilegesmall.com"]
     start_urls =    ['https://www.choiceprivilegesmall.com/az?orderBy=name&page=']
@@ -56,11 +57,21 @@ class ChoicePrivilegeSmallSpider(CrawlSpider):
         for data in div:
             name        = data.xpath('a/span[2]/text()').extract()[0]
             link        = [self.base_url + link for link in data.xpath('a/@href').extract()][:][0]
-            cashback    = data.xpath('a/span[3]/text()').extract()[0]
+            cashback    = data.xpath('a/span[3]/text()').extract_first()
             item['name']        = name.replace("'", "''")
             item['link']        = link
             item['cashback']    = cashback.replace("'", "''")
-            item['sid']         = self.name
+            item['sid']         = self.store_name
             item['ctype']       = 2
+            item['numbers']     = self.getNumbers(cashback).replace('$', '').replace('%', '')
             yield item
+
+    def getNumbers(self, cashback):
+        cash = cashback
+        pattern = r'\d+(?:\.\d+)?'
+        ret =  re.findall(pattern, cash)
+        if len(ret):
+            return ret[0]
+        else:
+            return "100"
 

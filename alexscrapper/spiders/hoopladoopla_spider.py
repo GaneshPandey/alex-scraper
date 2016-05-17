@@ -19,6 +19,7 @@ import requests
 
 
 class HooplaDooplaSpider(CrawlSpider):
+    store_name = "Hoopla Doopla"
     name = "hoopladoopla"
 
     allowed_domains = ["hoopladoopla.com"]
@@ -52,12 +53,24 @@ class HooplaDooplaSpider(CrawlSpider):
         store = response.xpath('//div[@id="merchantlisting"]')
 
         for data in store:
-            name = str(data.xpath('table/tbody/tr/td[1]/a/text()').extract()[0])
+            name = str(data.xpath('table/tbody/tr/td[1]/a/text()').extract()[0].encode('utf-8'))
             cashback = str(data.xpath('table/tbody/tr/td[2]/text()').extract()[0])
             link =  str([self.base_url+link for link in data.xpath('table/tbody/tr/td[1]/a/@href').extract()][0])
             item['name']        = name.replace("'", "''")
             item['link']        = link
             item['cashback']    = cashback.replace("'", "''")
-            item['sid']         = self.name
+            item['sid']         = self.store_name
             item['ctype']       = 1
+            item['numbers']     = self.getNumbers(cashback).replace('$', '').replace('%', '')
             yield item
+
+
+
+    def getNumbers(self, cashback):
+        cash = cashback
+        pattern = r'\d+(?:\.\d+)?%|\$\d+(?:\.\d+)?'
+        ret =  re.findall(pattern, cash)
+        if len(ret):
+            return ret[0]
+        else:
+            return "100"

@@ -19,6 +19,7 @@ from lxml import html
 
 
 class SpiritSpider(CrawlSpider):
+    store_name = "Free Spirit Online Mall"
     name = "spirit"
     allowed_domains = ["spirit.com"]
     start_urls =    ['http://mall.spirit.com/az?orderBy=name&letter=&page=']
@@ -61,6 +62,10 @@ class SpiritSpider(CrawlSpider):
             item['name']        = name.replace("'", "''")
             item['link']        = link
             item['cashback']    = cashback.replace("'", "''")
-            item['sid']         = self.name
-            item['ctype']       = 2
+            item['sid']         = self.store_name
+            item['ctype']       = 3
+            item['numbers']     = self.getNumbers(cashback).replace('$', '').replace('%', '')
             yield item
+
+    def getNumbers(self, cashback):
+        return cashback.split(' ', 1)[0]

@@ -20,6 +20,7 @@ import requests
 
 
 class ExtrarebatesSpider(CrawlSpider):
+    store_name = "Extra Rebates"
     name = "extrarebates"
 
     allowed_domains = ["extrarebates.com"]
@@ -74,9 +75,14 @@ class ExtrarebatesSpider(CrawlSpider):
 
             item['name']        = name.replace("'", "''")
             item['link']        = link
-            item['sid']         = self.name
+            item['sid']         = self.store_name
             item['ctype']       = 1
+            item['numbers']     = self.getNumbers(cashback).replace('$', '').replace('%', '')
             yield item
+
+
+    def getNumbers(self, cashback):
+        return str(cashback)
 
 
 

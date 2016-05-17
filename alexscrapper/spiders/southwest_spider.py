@@ -19,6 +19,7 @@ from lxml import html
 
 
 class SouthwestSpider(CrawlSpider):
+    store_name = "South West"
     name = "southwest"
     allowed_domains = ["southwest.com"]
     start_urls =    ['https://rapidrewardsshopping.southwest.com/shopping/b____alpha.htm']

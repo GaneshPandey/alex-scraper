@@ -18,6 +18,7 @@ import requests
 
 
 class YangingSpider(CrawlSpider):
+    store_name = "Yanging"
     name = "yazing"
     i = 0
     allowed_domains = ["yazing.com"]
@@ -55,7 +56,7 @@ class YangingSpider(CrawlSpider):
             item['name']        = name.replace("'", "''")
             item['link']        = link
             item['cashback']    = cashback.replace("'", "''")
-            item['sid']         = self.name
+            item['sid']         = self.store_name
             item['ctype']       = 1
             yield item
 

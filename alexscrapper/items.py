@@ -130,6 +130,7 @@ class Yaging(scrapy.Item):
 	cashback 	= scrapy.Field()
 	sid 		= scrapy.Field()
 	ctype 		= scrapy.Field()
+	numbers		= scrapy.Field()
 
 # class MileagePlanShopping(scrapy.Item):
 # 	link 		= scrapy.Field()

@@ -19,6 +19,7 @@ import requests
 
 
 class ExtraBuxSpider(CrawlSpider):
+    store_name = "Extra Bux"
     name = "extrabux"
 
     allowed_domains = ["extrabux.com"]
@@ -59,11 +60,23 @@ class ExtraBuxSpider(CrawlSpider):
                 pos = st.find("(")
                 clean_name.append(st[0:pos-1].lstrip())
 
-            cash = data.xpath('div[@class="linkContainer"]/a[@class="cashBack transferLink"]/text()').extract()
+            cashback = data.xpath('div[@class="linkContainer"]/a[@class="cashBack transferLink"]/text()').extract_first()
             item['link'] =  [self.base_url+link for link in data.xpath('a/@href').extract()][0]
             item['name']  = clean_name[0].replace("'", "''")
             pattern = r'([\d.]+)'
-            item['cashback'] = [re.findall(pattern, c) for c in cash][0][0].replace("'", "''")
-            item['sid']         = self.name
+            item['cashback']    = cashback
+          #  item['cashback'] = [re.findall(pattern, c) for c in cash][0][0].replace("'", "''")
+            item['sid']         = self.store_name
             item['ctype']       = 1
+            item['numbers']     = self.getNumbers(cashback).replace('$', '').replace('%', '')
             yield item
+
+
+    def getNumbers(self, cashback):
+        cash = cashback
+        pattern = r'\d+(?:\.\d+)?'
+        ret =  re.findall(pattern, cash)
+        if len(ret):
+            return ret[0]
+        else:
+            return "100"

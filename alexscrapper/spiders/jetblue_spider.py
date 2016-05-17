@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 import scrapy
 from scrapy.http import Request, FormRequest
@@ -19,6 +20,7 @@ from lxml import html
 
 
 class JetblueSpider(CrawlSpider):
+    store_name = "Jet Blue"
     name = "jetblue"
     allowed_domains = ["jetblue.com"]
     start_urls =    ['http://shoptrue.jetblue.com/az?orderBy=name&page=']
@@ -60,7 +62,12 @@ class JetblueSpider(CrawlSpider):
             item['name']        = name.replace("'", "''")
             item['link']        = link
             item['cashback']    = cashback.replace("'", "''")
-            item['sid']         = self.name
+            item['sid']         = self.store_name
             item['ctype']       = 2
+            item['numbers']     = self.getNumbers(cashback).replace('%', '').replace('$','')
             yield item
     
+    def getNumbers(self, cashback):
+        cash = cashback
+        pattern = r'\d+(?:\.\d+)?'
+        return re.findall(pattern, cash)[0]

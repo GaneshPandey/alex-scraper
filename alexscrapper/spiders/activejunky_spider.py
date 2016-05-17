@@ -17,6 +17,7 @@ from HTMLParser import HTMLParser
 
 
 class ActivejunkySpider(CrawlSpider):
+    store_name = "ActiveJunky"
     name = "activejunky"
 
     allowed_domains = ["activejunky.com"]
@@ -69,7 +70,16 @@ class ActivejunkySpider(CrawlSpider):
             item['name']        = name.replace("'", "''")
             item['link']        = link
             item['cashback']    = cashback.replace("'", "''")
-            item['sid']         = self.name
+            item['sid']         = self.store_name
             item['ctype']       = 1
+            item['numbers']     = self.getNumbers(cashback).replace('$', '').replace('%', '')
             yield item
-            
+    
+    def getNumbers(self, cashback):
+        cash = cashback
+        pattern = r'\d+(?:\.\d+)?'
+        ret =  re.findall(pattern, cash)
+        if len(ret):
+            return ret[0]
+        else:
+            return "100"

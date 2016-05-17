@@ -19,6 +19,7 @@ from lxml import html
 
 
 class FlyStoreSpider(CrawlSpider):
+    store_name = "FlyStore Virginamerica"
     name = "flystore"
     allowed_domains = ["virginamerica.com"]
     start_urls =    ['https://flystore.virginamerica.com/az?orderBy=name&letter=&page=']
@@ -61,6 +62,17 @@ class FlyStoreSpider(CrawlSpider):
             item['name']        = name.replace("'", "''")
             item['link']        = link
             item['cashback']    = cashback.replace("'", "''")
-            item['sid']         = self.name
+            item['sid']         = self.store_name
             item['ctype']       = 2
+            item['numbers']     = self.getNumbers(cashback).replace('$', '').replace('%', '')
             yield item
+
+
+    def getNumbers(self, cashback):
+        cash = cashback
+        pattern = r'\d+(?:\.\d+)?'
+        ret =  re.findall(pattern, cash)
+        if len(ret):
+            return ret[0]
+        else:
+            return "100"

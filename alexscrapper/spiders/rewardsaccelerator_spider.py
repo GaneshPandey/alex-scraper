@@ -19,6 +19,7 @@ import requests
 
 
 class RewardsAcceleratorSpider(CrawlSpider):
+    store_name = "Rewards Accelerator"
     name = "rewardsaccelerator"
 
     allowed_domains = ["rewardsaccelerator.com"]
@@ -58,7 +59,11 @@ class RewardsAcceleratorSpider(CrawlSpider):
             item['name']        = name.replace("'", "''")
             item['link']        = link
             item['cashback']    = cashback.replace("'", "''")
-            item['sid']         = self.name
+            item['sid']         = self.store_name
             item['ctype']       = 1
-
+            item['numbers']     = self.getNumbers(cashback).replace('$', '').replace('%', '')
             yield item
+
+
+    def getNumbers(self, cashback):
+        return '12'

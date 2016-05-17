@@ -19,6 +19,7 @@ import requests
 
 
 class MrRebatesSpider(CrawlSpider):
+    store_name = "Mr Rebates"
     name = "mrrebates"
 
     allowed_domains = ["mrrebates.com"]
@@ -58,10 +59,17 @@ class MrRebatesSpider(CrawlSpider):
         for data in tr:
             name        = str(data.xpath('td/a/b/text()').extract()[0])
             link        = str([self.base_url + link for link in data.xpath('td/a/@href').extract()][:][0])
-            cashback    = str(data.xpath('td[3]/text()').extract()[0])  
+            cashback    = str(data.xpath('td[3]/text()').extract_first().encode('utf-8'))  
             item['name']        = name.replace("'", "''")
             item['link']        = link
             item['cashback']    = cashback.replace("'", "''")
-            item['sid']         = self.name
+            item['sid']         = self.store_name
             item['ctype']       = 1
+            item['numbers']     = self.getNumbers(cashback).replace('$', '').replace('%', '')
             yield item
+
+    def getNumbers(self, cashback):
+        cash = cashback
+        pattern = r'\d+(?:\.\d+)?%|\$\d+(?:\.\d+)?'
+        return re.findall(pattern, cash)[0]
+

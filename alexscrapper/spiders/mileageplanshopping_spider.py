@@ -18,6 +18,7 @@ import requests
 
 
 class MileagePlanShoppingSpider(CrawlSpider):
+    store_name = "Mileage Plan Shopping"
     name = "mileageplanshopping"
     allowed_domains = ["mileageplanshopping.com"]
     start_urls =    ['https://www.mileageplanshopping.com/b____.htm']

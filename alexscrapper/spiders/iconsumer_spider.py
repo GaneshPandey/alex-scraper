@@ -19,6 +19,7 @@ import requests
 
 
 class IconsumerSpider(CrawlSpider):
+    store_name = "I consumer"
     name = "iconsumer"
 
     allowed_domains = ["iconsumer.com"]
@@ -52,14 +53,15 @@ class IconsumerSpider(CrawlSpider):
         store = response.xpath('//div[@class="inner4_blk2"]/ul/li')
 
         for data in store:
-            name    = str(data.xpath('div/a/text()').extract()[0])
+            name    = str(data.xpath('div/a/text()').extract_first().encode('utf-8'))
             link    = str([self.parse_link(link) for link in data.xpath('a[2]/@onclick').extract()][0])
-            cashback = str(data.xpath('a[2]/small/text()').extract()[0])
+            cashback = str(data.xpath('a[2]/small/text()').extract_first().encode('utf-8'))
             item['name']        = name.replace("'", "''")
             item['link']        = link
             item['cashback']    = cashback.replace("'", "''")
-            item['sid']         = self.name
+            item['sid']         = self.store_name
             item['ctype']       = 1
+            item['numbers']     = self.getNumbers(cashback).replace('$', '').replace('%', '')
             yield item
 
 
@@ -67,3 +69,13 @@ class IconsumerSpider(CrawlSpider):
         start = jstring.find("http")
         end = jstring.find("')")
         return jstring[start:end]
+
+
+    def getNumbers(self, cashback):
+        cash = cashback
+        pattern = r'\d+(?:\.\d+)?%|\$\d+(?:\.\d+)?'
+        ret =  re.findall(pattern, cash)
+        if len(ret):
+            return ret[0]
+        else:
+            return "100"

@@ -19,6 +19,7 @@ import requests
 
 
 class ShopAtHomeSpider(CrawlSpider):
+    store_name = "Shop At Home"
     name = "shopathome"
 
     allowed_domains = ["shopathome.com"]
@@ -53,10 +54,17 @@ class ShopAtHomeSpider(CrawlSpider):
         for data in tr:
             name        =  data.xpath('td[2]/a/text()').extract()[0]
             link        =  [link for link in data.xpath('td[2]/a/@href').extract()][0]
-            cashback    =  data.xpath('td[4]/div/div/span/text()').extract()[0]
+            cashback    =  data.xpath('td[4]/div/div/span/text()').extract_first()
             item['name']        = name.replace("'", "''")
             item['link']        = link
             item['cashback']    = cashback.replace("'", "''")
-            item['sid']         = self.name
+            item['sid']         = self.store_name
             item['ctype']       = 1
+            item['numbers']     = self.getNumbers(cashback).replace('$', '').replace('%', '')
             yield item
+
+    
+    def getNumbers(self, cashback):
+        cash = cashback
+        pattern = r'\d+(?:\.\d+)?%|\$\d+(?:\.\d+)?'
+        return re.findall(pattern, cash)[0]

@@ -19,6 +19,7 @@ import requests
 
 
 class FatwalletSpider(CrawlSpider):
+    store_name = "Fatwallet"
     name = "fatwallet"
 
     allowed_domains = ["fatwallet.com"]
@@ -59,6 +60,17 @@ class FatwalletSpider(CrawlSpider):
             item['name']        = name.replace("'", "''")
             item['link']        = link
             item['cashback']    = cashback.replace("'", "''")
-            item['sid']         = self.name
-            item['ctype']       = 0
+            item['sid']         = self.store_name
+            item['ctype']       = 4
+            item['numbers']     = self.getNumbers(cashback).replace('$', '').replace('%', '')
             yield item
+
+
+    def getNumbers(self, cashback):
+            cash = cashback
+            pattern = r'\d+(?:\.\d+)?'
+            ret =  re.findall(pattern, cash)
+            if len(ret):
+                return ret[0]
+            else:
+                return "100"

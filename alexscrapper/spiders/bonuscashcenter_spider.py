@@ -19,6 +19,7 @@ import requests
 
 
 class BonusCashCenter(CrawlSpider):
+    store_name = "Bonus Cash Center"
     name = "bonuscashcenter"
 
     allowed_domains = ["bonuscashcenter.com"]

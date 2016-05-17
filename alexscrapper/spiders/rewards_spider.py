@@ -19,6 +19,7 @@ from lxml import html
 
 
 class RewardsSpider(CrawlSpider):
+    store_name = "Marriott"
     name = "rewards"
     allowed_domains = ["rewards.com"]
     start_urls =    ['https://marriott.rewards.com/earnpoints/allMerchants']
@@ -53,7 +54,13 @@ class RewardsSpider(CrawlSpider):
             item['name']        = name.replace("'", "''")
             item['link']        = link
             item['cashback']    = cashback.replace("'", "''")
-            item['sid']         = self.name
+            item['sid']         = self.store_name
             item['ctype']       = 2
+            item['numbers']     = self.getNumbers(cashback)
             yield item
+
+    def getNumbers(self, cashback):
+        pattern = r'\d+(?:\.\d+)?'
+        return re.findall(pattern, cashback)[0]
+
     

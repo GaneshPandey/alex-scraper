@@ -52,12 +52,12 @@ class DiscoverSpider(CrawlSpider):
         item = Yaging()
         datas = self.get_html(self.start_urls[0])
         for data in datas.xpath('//div[@class="mn_srchListSection"]/ul/li'):
-            name            = data.xpath('a[2]/text()').extract()
-            cash_data       = data.xpath('span/text()').extract()
-            cash           = [cash.split(' ')[0] for cash in cash_data]
-            item['link']    = [self.base_url+link for link in data.xpath('/a[2]/text()').extract()]
-            item['name']    = name
-            item['cashback'] = cash
+            name                = data.xpath('a[2]/text()').extract()
+            cashback            = data.xpath('span/text()').extract_first()
+            item['link']        = [self.base_url+link for link in data.xpath('/a[2]/text()').extract()]
+            item['name']        = name
+            item['cashback']    = cashback
+            item['numbers']     = self.getNumbers(cashback).replace('$', '').replace('%', '')
             yield item
 
     def get_html(self, url):
@@ -65,3 +65,14 @@ class DiscoverSpider(CrawlSpider):
             result = r.frame.toHtml()
             formatted_result = str(result.toAscii())
             return html.fromstring(formatted_result)
+
+    def getNumbers(self, cashback):
+        cash = cashback
+        pattern = r'\d+(?:\.\d+)?'
+        ret =  re.findall(pattern, cash)
+        if len(ret):
+            return ret[0]
+        else:
+            return "100"
+
+

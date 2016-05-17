@@ -19,6 +19,7 @@ import requests
 
 
 class SimplyBestCouponsSpider(CrawlSpider):
+    store_name = "Simply Best Coupons"
     name = "simplybestcoupons"
 
     allowed_domains = ["simplybestcoupons.com"]

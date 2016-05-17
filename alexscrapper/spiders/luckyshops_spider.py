@@ -19,6 +19,7 @@ import requests
 
 
 class LuckyshopsSider(CrawlSpider):
+    store_name = "Lucky Shops"
     name = "luckyshops"
 
     allowed_domains = ["rewards.luckyshops.com"]
@@ -59,11 +60,18 @@ class LuckyshopsSider(CrawlSpider):
             item['link']        = link
             cashback            = cashback.replace("<span>", "").replace("</span>", "")
             item['cashback']    = cashback.replace("'", "''")
-            item['sid']         = self.name
+            item['sid']         = self.store_name
             item['ctype']       = 1
+            item['numbers']     = self.getNumbers(cashback).replace('%','').replace('$','')
             yield item
 
 
     def parse_link(self, jstring):
         start = jstring.find("../") + 2
         return jstring[start:]
+
+
+    def getNumbers(self, cashback):
+        cash = cashback
+        pattern = r'\d+(?:\.\d+)?%|\$\d+(?:\.\d+)?'
+        return re.findall(pattern, cash)[0]

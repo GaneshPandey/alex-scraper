@@ -19,6 +19,7 @@ import requests
 
 
 class BefrugalSpider(CrawlSpider):
+    store_name = "Befrugal"
     name = "befrugal"
 
     allowed_domains = ["befrugal.com"]

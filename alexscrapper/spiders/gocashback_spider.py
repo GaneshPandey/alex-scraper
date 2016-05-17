@@ -19,6 +19,7 @@ import requests
 
 
 class GoCashBackSpider(CrawlSpider):
+    store_name = "Go CashBack"
     name = "gocashback"
 
     allowed_domains = ["gocashback.com"]
@@ -57,8 +58,9 @@ class GoCashBackSpider(CrawlSpider):
             item['name']        = name.replace("'", "''")
             item['link']        = link
             item['cashback']    = self.getCleanName(cashback).replace("'", "''")
-            item['sid']         = self.name
+            item['sid']         = self.store_name
             item['ctype']       = 1
+            item['numbers']     = self.getNumbers(cashback).replace('$', '').replace('%', '')
             yield item
 
 
@@ -69,4 +71,12 @@ class GoCashBackSpider(CrawlSpider):
         return cashback
 
 
+    def getNumbers(self, cashback):
+        cash = cashback
+        pattern = r'\d+(?:\.\d+)?'
+        ret =  re.findall(pattern, cash)
+        if len(ret):
+            return ret[0]
+        else:
+            return "100"
 

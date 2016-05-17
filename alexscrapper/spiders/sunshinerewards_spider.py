@@ -18,9 +18,10 @@ import requests
 
 
 class SunshineRewardsSpider(CrawlSpider):
+    store_name = "Sunshine Rewards"
     name = "sunshinerewards"
 
-    allowed_domains = ["sunshinerewards.com", "kyamna.com"]
+    allowed_domains = ["sunshinerewards.com"]
 
     start_urls =    ['http://kyamna.com/sunshinerewards.html']
 

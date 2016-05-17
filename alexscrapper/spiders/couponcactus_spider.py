@@ -19,6 +19,7 @@ import requests
 
 
 class CouponCactus(CrawlSpider):
+    store_name = "CouponCactus"
     name = "couponcactus"
 
     allowed_domains = ["couponcactus.com"]
@@ -51,13 +52,24 @@ class CouponCactus(CrawlSpider):
         item = Yaging()
         for data in tr:
             name            = data.xpath('td/a/text()').extract_first()
-            cash_data       = data.xpath('td[2]/text()').extract_first()
+            cashback       = data.xpath('td[2]/text()').extract_first()
             if name:
-                if cash_data:
+                if cashback:
                     item['link']    = self.base_url + data.xpath('td/a/@href').extract_first()
                     item['name']    = name.replace("'", "''").replace("coupons", "")
-                    item['cashback'] = cash_data.replace("'", "''")
-                    item['sid']         = self.name
+                    item['cashback'] = cashback.replace("'", "''")
+                    item['sid']         = self.store_name
+                    item['numbers']     = self.getNumbers(cashback).replace('$', '').replace('%', '')
                     item['ctype']       = 1
                     
             yield item
+
+
+    def getNumbers(self, cashback):
+        cash = cashback
+        pattern = r'\d+(?:\.\d+)?'
+        ret =  re.findall(pattern, cash)
+        if len(ret):
+            return ret[0]
+        else:
+            return "100"
