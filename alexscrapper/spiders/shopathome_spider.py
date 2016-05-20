@@ -64,7 +64,7 @@ class ShopAtHomeSpider(CrawlSpider):
                 pass
             item['cashback']    = cashback.replace("'", "''")
             item['sid']         = self.store_name
-            item['ctype']       = 3
+            item['ctype']       = 1
             item['numbers']     = self.getNumbers(cashback).replace('$', '').replace('%', '')
             item['domainurl']   = self.base_url
             yield item

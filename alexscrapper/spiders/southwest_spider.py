@@ -60,7 +60,7 @@ class SouthWestSpider(CrawlSpider):
             item['link']        = link
             item['cashback']    = str(cashback) + " " + j['response'][x]['merchant']['rebate']['currency']
             item['sid']         = self.store_name
-            item['ctype']       = 3
+            item['ctype']       = 2
             item['numbers']     = cashback
             item['domainurl']   = self.base_url
             yield item

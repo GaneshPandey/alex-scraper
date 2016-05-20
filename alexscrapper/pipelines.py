@@ -35,7 +35,7 @@ class MySQLStorePipeline(object):
 # aadvantageeshopping
 # activejunky
 # amtrakGuestRewards
-# banks
+################# banks
 # barclaycardrewardsboost
 ########################### befrugal
 # bonuscashcenter
@@ -45,7 +45,7 @@ class MySQLStorePipeline(object):
 # extrabux
 # extrarebates
 # fatwallet
-# flystore
+# #######################################flystore
 # givingassistant
 # gocashback
 ######################### hawaiianairlines
