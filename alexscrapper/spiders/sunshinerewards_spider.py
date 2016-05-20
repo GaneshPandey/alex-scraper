@@ -55,9 +55,15 @@ class SunshineRewardsSpider(CrawlSpider):
         tr          = response.xpath('//center/table/tr')
         tr = tr[1:]
         for t in tr:
-            name        = t.xpath('td[1]/a/@title').extract_first()
-            link        = t.xpath('td[1]/a/@href').extract_first()
-            cashback    = t.xpath('td[2]/text()').extract_first()
+            name        = str(t.xpath('td[1]/a/@title').extract_first())
+            link        = str(t.xpath('td[1]/a/@href').extract_first())
+            cashback    = str(t.xpath('td[2]/text()').extract_first())
+            if "$" in cashback:
+                cashback = "$"+ str(self.getNumbers(cashback))
+            elif "%" in cashback:
+                cashback = str(self.getNumbers(cashback)) + "%"
+            else:
+                cashback = ""
             item['name']        = name.replace("'", "''")
             item['link']        = link
             item['cashback']    = cashback.replace("'", "''")
