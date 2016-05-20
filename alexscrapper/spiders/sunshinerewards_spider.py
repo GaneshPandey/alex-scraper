@@ -60,7 +60,7 @@ class SunshineRewardsSpider(CrawlSpider):
             cashback    = t.xpath('td[2]/text()').extract_first()
             item['name']        = name.replace("'", "''")
             item['link']        = link
-            item['cashback']    = self.base_url + cashback.replace("'", "''")
+            item['cashback']    = cashback.replace("'", "''")
             item['sid']         = self.store_name
             item['ctype']       = 1
             item['numbers']     = self.getNumbers(cashback).replace('$', '').replace('%', '')
