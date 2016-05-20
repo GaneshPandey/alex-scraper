@@ -57,10 +57,17 @@ class GoCashBackSpider(CrawlSpider):
             link =  [self.base_url+link for link in data.xpath('div[@class="left"]/a/@href').extract()][0]
             item['name']        = name.replace("'", "''")
             item['link']        = link
+            if "$" in cashback:
+                cashback = "$"+ str(self.getNumbers(cashback))
+            elif "%" in cashback:
+                cashback = str(self.getNumbers(cashback)) + "%"
+            else:
+                pass
             item['cashback']    = self.getCleanName(cashback).replace("'", "''")
             item['sid']         = self.store_name
             item['ctype']       = 1
             item['numbers']     = self.getNumbers(cashback).replace('$', '').replace('%', '')
+            item['domainurl']   = self.base_url
             yield item
 
 

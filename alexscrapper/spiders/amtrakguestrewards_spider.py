@@ -69,6 +69,7 @@ class AmtrakGuestRewardsSpider(CrawlSpider):
             item['sid']         = self.store_name
             item['ctype']       = 2
             item['numbers']     = self.getNumbers(cashback).replace('$', '').replace('%', '')
+            item['domainurl']   = self.base_url
             yield item
     
 

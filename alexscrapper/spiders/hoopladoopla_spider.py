@@ -62,6 +62,7 @@ class HooplaDooplaSpider(CrawlSpider):
             item['sid']         = self.store_name
             item['ctype']       = 1
             item['numbers']     = self.getNumbers(cashback).replace('$', '').replace('%', '')
+            item['domainurl']   = self.base_url
             yield item
 
 

@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 import scrapy
 from scrapy.http import Request, FormRequest
@@ -57,10 +58,17 @@ class GivingAssistantSpider(CrawlSpider):
             link        =  self.base_url+ data.xpath('a/@href').extract_first()
             item['name']        = name.replace("'", "''")
             item['link']        = link
+            if "$" in cashback:
+                cashback = "$"+ str(self.getNumbers(cashback))
+            elif "%" in cashback:
+                cashback = str(self.getNumbers(cashback)) + "%"
+            else:
+                pass
             item['cashback']    = cashback.replace("'", "''")
             item['sid']         = self.store_name
             item['ctype']       = 1
             item['numbers']     = self.getNumbers(cashback).replace('$', '').replace('%', '')
+            item['domainurl']   = self.base_url
             yield item
 
 

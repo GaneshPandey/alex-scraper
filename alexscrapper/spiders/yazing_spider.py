@@ -18,7 +18,7 @@ import requests
 
 
 class YangingSpider(CrawlSpider):
-    store_name = "Yanging"
+    store_name = "Yazing"
     name = "yazing"
     i = 0
     allowed_domains = ["yazing.com"]
@@ -55,9 +55,24 @@ class YangingSpider(CrawlSpider):
             name = str([data.xpath('div[1]/h4/a/text()').extract()][0][0])
             item['name']        = name.replace("'", "''")
             item['link']        = link
+            if "$" in cashback:
+                cashback = "$"+ str(self.getNumbers(cashback))
+            elif "%" in cashback:
+                cashback = str(self.getNumbers(cashback)) + "%"
+            else:
+                cashback = ""
             item['cashback']    = cashback.replace("'", "''")
             item['sid']         = self.store_name
             item['ctype']       = 1
+            item['numbers']     = self.getNumbers(cashback).replace('$', '').replace('%', '')
+            item['domainurl']   = self.base_url
             yield item
 
-    
+    def getNumbers(self, cashback):
+        cash = cashback
+        pattern = r'\d+(?:\.\d+)?'
+        ret =  re.findall(pattern, cash)
+        if len(ret):
+            return ret[0]
+        else:
+            return "100"

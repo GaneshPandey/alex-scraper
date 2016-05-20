@@ -18,26 +18,26 @@ import requests
 from lxml import html
 
 
-class SplenderSpider(CrawlSpider):
-    store_name = "Splender"
-    name = "splender"
-    allowed_domains = ["splender.com", "cartera.com", "api.cartera.com"]
-    start_urls =    ['https://www.splender.com/api/content/merchants?fl=name,url_safe_name,rebate,categories,class,logoUrl,offers,min_rebate_value']
-    base_url = 'https://www.splender.com/#!/stores/2152/'
+class MileagePlusSpider(CrawlSpider):
+    store_name = "MileagePlus Shopping"
+    name = "mileageplus"
+    allowed_domains = ["mileageplus.com", "cartera.com", "api.cartera.com"]
+    start_urls =    ['https://api.cartera.com/content/v3/placements?page_id=2395&brand_id=227&section_id=10161&sort_by=random&fields=assets,clickUrl,merchant.rebate,merchant.id,merchant.name&content_type_id=1']
+    base_url = 'http://mileageplus.com'
 
     headers = {
         'Accept':'application/json, text/javascript, */*; q=0.01',
         'Accept-Encoding':'gzip, deflate, sdch',
         'Accept-Language':'en-US,en;q=0.8,hi;q=0.6,ar;q=0.4,ne;q=0.2,es;q=0.2',
         'Connection':'keep-alive',
-        'Host': 'www.splender.com',
-        'secret_token':'60885065c1a94506c8c75936bf795671',
-        'access_token': '32fceb644f3952a711935ffb308a80392d43507c',
+        'Host': 'api.cartera.com',
+        'X-App-Id': '0fbc31d8',
+        'X-App-Key': '57344736f10a4e521003a9f2b0f6e6af',
         'Cache-Control': 'no-cache'
     }
 
     def __init__(self, *args, **kwargs):
-        super(SplenderSpider, self).__init__(*args, **kwargs)
+        super(MileagePlusSpider, self).__init__(*args, **kwargs)
         settings.set('RETRY_HTTP_CODES', [500, 503, 504, 400, 408, 404] )
         settings.set('RETRY_TIMES', 5 )
         settings.set('REDIRECT_ENABLED', True)
@@ -52,15 +52,15 @@ class SplenderSpider(CrawlSpider):
     def parse_product(self, response):
         item        = Yaging()
         j           = json.loads(response.body)
-        for x in xrange(0,len(j['docs'])):
-            name        = j['docs'][x]['name']
-            link        = j['docs'][x]['url_safe_name']
-            cashback    = j['docs'][x]['rebate']['value']
+        for x in xrange(0,len(j['response'])):
+            name        = j['response'][x]['merchant']['name']
+            link        = j['response'][x]['clickUrl']
+            cashback    = j['response'][x]['merchant']['rebate']['value']
             item['name']        = name.replace("'", "''")
-            item['link']        = self.base_url + link
-            item['cashback']    = str(cashback) + " " + j['docs'][x]['rebate']['currency']
+            item['link']        = link
+            item['cashback']    = str(cashback) + " " + j['response'][x]['merchant']['rebate']['currency']
             item['sid']         = self.store_name
-            item['ctype']       = 1
+            item['ctype']       = 3
             item['numbers']     = cashback
             item['domainurl']   = self.base_url
             yield item

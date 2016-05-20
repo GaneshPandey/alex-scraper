@@ -20,8 +20,8 @@ import requests
 class MileagePlanShoppingSpider(CrawlSpider):
     store_name = "Mileage Plan Shopping"
     name = "mileageplanshopping"
-    allowed_domains = ["mileageplanshopping.com"]
-    start_urls =    ['https://www.mileageplanshopping.com/b____.htm']
+    allowed_domains = ["mileageplanshopping.com", "cartera.com", "api.cartera.com"]
+    start_urls =    ['https://api.cartera.com/content/v3/merchants?page_id=2395&brand_id=358&limit=2000&offset=0&sort_by=name&fields=name%2Cid%2CclickUrl%2Crebate.currency%2Crebate.value%2Crebate.originalValue']
     base_url = 'http://mileageplanshopping.com'
 
     headers = {
@@ -29,13 +29,10 @@ class MileagePlanShoppingSpider(CrawlSpider):
         'Accept-Encoding':'gzip, deflate, sdch',
         'Accept-Language':'en-US,en;q=0.8,hi;q=0.6,ar;q=0.4,ne;q=0.2,es;q=0.2',
         'Connection':'keep-alive',
-        'Host':'api.cartera.com',
-        'Origin':'https://www.mileageplanshopping.com',
-        'Referer':'https://www.mileageplanshopping.com/b____.htm',
-        'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.75 Safari/537.36',
-        'X-App-Id':'44ec0586',
-        'X-App-Key':'9d6abd7ef1840576f31a022ba48fb92d',
-        'X-Mem-Id':'Co7ZAuffNM4Hb309Q7nlvw4wY783xZSQdp4iy3ELmQ0rgj2omt9TDb6Zmfh45frFvDsD7/kkCk6wjayefHuFAob8LgabS5+Ctw4NEVaxbmXY+0R5TYzBrFHn1a+dLDaRi2TxkVolMN4QVypp6V8wRlub0o5aIfR2tN0tTn55LdNO5CVBreWl6G/ZZG2mn640sxpQbQ6cFoZhArW8F8y7vPabzgczdD4nmBvq6PNqgGU='
+        'Host': 'api.cartera.com',
+        'X-App-Id': '44ec0586',
+        'X-App-Key': '9d6abd7ef1840576f31a022ba48fb92d',
+        'Cache-Control': 'no-cache'
     }
 
     def __init__(self, *args, **kwargs):
@@ -52,21 +49,17 @@ class MileagePlanShoppingSpider(CrawlSpider):
             yield Request(url=url, callback=self.parse_product, headers=self.headers)
 
     def parse_product(self, response):
-        print response.body
-        item 		= MileagePlanShopping()
-        item['name'] = response.body
-        yield item
-        # pattern 	= ur'([\d.]+)'
-        # div         = response.xpath('//div[@class="row thumbnail valign brand appear"]')
-
-        # for data in div:
-        #     cashback = data.xpath('div[2]/h5/text()').extract()[:][0]
-        #     link = data.xpath('div[1]/h4/a/@href').extract()[:][0]
-        #     name = [data.xpath('div[1]/h4/a/text()').extract()][0][0]
-        #     item['name']        = name
-        #     item['link']        = link
-        #     item['cashback']    =  cashback
-        #     yield item
-
-        # ctype = 2
-    
+        item        = Yaging()
+        j           = json.loads(response.body)
+        for x in xrange(0,len(j['response'])):
+            name        = j['response'][x]['name']
+            link        = j['response'][x]['clickUrl']
+            cashback    = j['response'][x]['rebate']['value']
+            item['name']        = name.replace("'", "''")
+            item['link']        = link
+            item['cashback']    = str(cashback) + " " + str(j['response'][x]['rebate']['currency'])
+            item['sid']         = self.store_name
+            item['ctype']       = 3
+            item['numbers']     = cashback
+            item['domainurl']   = self.base_url
+            yield item

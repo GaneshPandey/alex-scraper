@@ -59,10 +59,17 @@ class LuckyshopsSider(CrawlSpider):
             item['name']        = name.replace("'", "''")
             item['link']        = link
             cashback            = cashback.replace("<span>", "").replace("</span>", "")
+            if "$" in cashback:
+                cashback = "$"+ str(self.getNumbers(cashback))
+            elif "%" in cashback:
+                cashback = str(self.getNumbers(cashback)) + "%"
+            else:
+                pass
             item['cashback']    = cashback.replace("'", "''")
             item['sid']         = self.store_name
             item['ctype']       = 1
             item['numbers']     = self.getNumbers(cashback).replace('%','').replace('$','')
+            item['domainurl']   = self.base_url
             yield item
 
 
@@ -73,5 +80,9 @@ class LuckyshopsSider(CrawlSpider):
 
     def getNumbers(self, cashback):
         cash = cashback
-        pattern = r'\d+(?:\.\d+)?%|\$\d+(?:\.\d+)?'
-        return re.findall(pattern, cash)[0]
+        pattern = r'\d+(?:\.\d+)?'
+        ret =  re.findall(pattern, cash)
+        if len(ret):
+            return ret[0]
+        else:
+            return "100"

@@ -18,20 +18,26 @@ import requests
 from lxml import html
 
 
-class SouthwestSpider(CrawlSpider):
-    store_name = "South West"
+class SouthWestSpider(CrawlSpider):
+    store_name = "Southwest Airlines"
     name = "southwest"
-    allowed_domains = ["southwest.com"]
-    start_urls =    ['https://rapidrewardsshopping.southwest.com/shopping/b____alpha.htm']
-    base_url = 'https://rapidrewardsshopping.southwest.com'
+    allowed_domains = ["southwest.com", "cartera.com", "api.cartera.com"]
+    start_urls =    ['https://api.cartera.com/content/v3/placements?page_id=2395&brand_id=247&section_id=10161&sort_by=random&fields=assets,clickUrl,merchant.rebate,merchant.id,merchant.name&content_type_id=1']
+    base_url = 'http://southwest.com'
 
     headers = {
-        'User-Agent': 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.10) Firefox/3.6.10 GTB7.1',
-        'Accept-Language': 'en-us,en;q=0.5'
+        'Accept':'application/json, text/javascript, */*; q=0.01',
+        'Accept-Encoding':'gzip, deflate, sdch',
+        'Accept-Language':'en-US,en;q=0.8,hi;q=0.6,ar;q=0.4,ne;q=0.2,es;q=0.2',
+        'Connection':'keep-alive',
+        'Host': 'api.cartera.com',
+        'X-App-Id': '75b5c196',
+        'X-App-Key': 'a2b0b2f57a098695b9aba4b1ff32eb1c',
+        'Cache-Control': 'no-cache'
     }
 
     def __init__(self, *args, **kwargs):
-        super(SouthwestSpider, self).__init__(*args, **kwargs)
+        super(SouthWestSpider, self).__init__(*args, **kwargs)
         settings.set('RETRY_HTTP_CODES', [500, 503, 504, 400, 408, 404] )
         settings.set('RETRY_TIMES', 5 )
         settings.set('REDIRECT_ENABLED', True)
@@ -44,13 +50,17 @@ class SouthwestSpider(CrawlSpider):
             yield Request(url=url, callback=self.parse_product, headers=self.headers)
 
     def parse_product(self, response):
-        item 		= Yaging()
-        pattern 	= ur'([\d.]+)'
-        div         = response.xpath('//div[@class="merchant-container-list"]')
-        for data in div:
-            item['name']        = data.xpath('div[@class="merchant-name"]/div/a/text()').extract()[:][0]
-            item['link']        = [self.base_url + link for link in data.xpath('div[@class="merchant-name"]/div/a/@href').extract()][:][0]
-            item['points']      = data.xpath('div[@class="merchant-cashback"]/div/text()').extract()[0].replace('\n', '').replace('\t', '').replace('\r', '')
+        item        = Yaging()
+        j           = json.loads(response.body)
+        for x in xrange(0,len(j['response'])):
+            name        = j['response'][x]['merchant']['name']
+            link        = j['response'][x]['clickUrl']
+            cashback    = j['response'][x]['merchant']['rebate']['value']
+            item['name']        = name.replace("'", "''")
+            item['link']        = link
+            item['cashback']    = str(cashback) + " " + j['response'][x]['merchant']['rebate']['currency']
+            item['sid']         = self.store_name
+            item['ctype']       = 3
+            item['numbers']     = cashback
+            item['domainurl']   = self.base_url
             yield item
-    
-    # ctype =2

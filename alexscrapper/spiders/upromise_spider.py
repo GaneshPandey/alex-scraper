@@ -18,23 +18,28 @@ import requests
 
 
 
-class ShopAtHomeSpider(CrawlSpider):
-    store_name = "Shop At Home"
-    name = "shopathome"
+class UPromiseSpider(CrawlSpider):
+    store_name = "UPromise Online"
+    name = "upromise"
 
-    allowed_domains = ["shopathome.com"]
+    allowed_domains = ["upromise.com"]
 
-    start_urls =    ['http://www.shopathome.com/stores?fbm=all&fbc=all']
+    start_urls =    ['https://shop.upromise.com/e/members/benefits.php?sid=132XXdKrlo132&xgroupby=partname&xsearch_type=offer&xletter=z&ajax=z&method=offerJSON&_=1463627668827']
 
-    base_url = 'http://www.shopathome.com'
+    base_url = 'https://shop.upromise.com'
 
     headers = {
         'User-Agent': 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.10) Firefox/3.6.10 GTB7.1',
         'Accept-Language': 'en-us,en;q=0.5'
     }
 
+    path = ['0','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
+
+    searchurls =    'https://shop.upromise.com/e/members/benefits.php?sid=132XXdKrlo132&xgroupby=partname&xsearch_type=offer&xletter={}&ajax={}&method=offerJSON&_=1463627668827'
+
+
     def __init__(self, *args, **kwargs):
-        super(ShopAtHomeSpider, self).__init__(*args, **kwargs)
+        super(UPromiseSpider, self).__init__(*args, **kwargs)
         settings.set('RETRY_HTTP_CODES', [500, 503, 504, 400, 408, 404] )
         settings.set('RETRY_TIMES', 5 )
         settings.set('REDIRECT_ENABLED', True)
@@ -43,33 +48,35 @@ class ShopAtHomeSpider(CrawlSpider):
 
 
     def start_requests(self):
-        for url in self.start_urls:
+        for p in self.path:
+            url = self.searchurls.format(p, p)
             yield Request(url=url, callback=self.parse_product, headers=self.headers)
 
     def parse_product(self, response):
-        item 		= Yaging()
-        table 		= response.xpath('//table')
-        tr 			= table.xpath('tbody/tr')
-        for data in tr:
-            name        =  str(data.xpath('td[2]/a/text()').extract_first().encode('utf-8'))
-            link       =  str(data.xpath('td[2]/a/@href').extract_first())
-            cashback    =  str(data.xpath('td[4]/div/div/span/text()').extract_first())
-            item['name']        = name.replace("'", "''")
-            item['link']        = link
+        item = Yaging()
+        li = response.xpath("//div/ul/li")
+        li = li[1:]
+        for l in li:
+            name 		= str(l.xpath('a/text()').extract_first())
+            cashback 	= str(l.xpath('a/span/text()').extract_first())
+            link 		= str(l.xpath('a/@href').extract_first())
+            link		= link.replace("\/", "/").replace('\\"', '')
             if "$" in cashback:
                 cashback = "$"+ str(self.getNumbers(cashback))
             elif "%" in cashback:
                 cashback = str(self.getNumbers(cashback)) + "%"
             else:
-                pass
+                cashback = ""
+            item['name']        = name.replace("'", "''")
+            item['link']        = self.base_url + link
             item['cashback']    = cashback.replace("'", "''")
             item['sid']         = self.store_name
-            item['ctype']       = 3
-            item['numbers']     = self.getNumbers(cashback).replace('$', '').replace('%', '')
+            item['ctype']       = 1
+            item['numbers']     = self.getNumbers(cashback).replace('%', '').replace('$', '')
             item['domainurl']   = self.base_url
             yield item
 
-    
+
     def getNumbers(self, cashback):
         cash = cashback
         pattern = r'\d+(?:\.\d+)?'
@@ -77,4 +84,4 @@ class ShopAtHomeSpider(CrawlSpider):
         if len(ret):
             return ret[0]
         else:
-            return "100"
+            return "0"

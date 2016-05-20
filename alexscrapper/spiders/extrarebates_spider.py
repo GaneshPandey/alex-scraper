@@ -27,7 +27,7 @@ class ExtrarebatesSpider(CrawlSpider):
 
     start_urls =    ['http://www.extrarebates.com/us/shopping/merchants.php']
 
-    base_url = 'http://www.extrarebates.com'
+    base_url = 'http://www.extrarebates.com/us/shopping'
 
     headers = {
         'User-Agent': 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.10) Firefox/3.6.10 GTB7.1',
@@ -78,6 +78,7 @@ class ExtrarebatesSpider(CrawlSpider):
             item['sid']         = self.store_name
             item['ctype']       = 1
             item['numbers']     = self.getNumbers(cashback).replace('$', '').replace('%', '')
+            item['domainurl']   = self.base_url
             yield item
 
 

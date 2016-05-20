@@ -58,10 +58,17 @@ class IconsumerSpider(CrawlSpider):
             cashback = str(data.xpath('a[2]/small/text()').extract_first().encode('utf-8'))
             item['name']        = name.replace("'", "''")
             item['link']        = link
+            if "$" in cashback:
+                cashback = ""+ str(self.getNumbers(cashback))
+            elif "%" in cashback:
+                cashback = str(self.getNumbers(cashback)) + ""
+            else:
+                pass
             item['cashback']    = cashback.replace("'", "''")
             item['sid']         = self.store_name
             item['ctype']       = 1
             item['numbers']     = self.getNumbers(cashback).replace('$', '').replace('%', '')
+            item['domainurl']   = self.base_url
             yield item
 
 

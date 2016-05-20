@@ -63,12 +63,17 @@ class ExtraBuxSpider(CrawlSpider):
             cashback = data.xpath('div[@class="linkContainer"]/a[@class="cashBack transferLink"]/text()').extract_first()
             item['link'] =  [self.base_url+link for link in data.xpath('a/@href').extract()][0]
             item['name']  = clean_name[0].replace("'", "''")
-            pattern = r'([\d.]+)'
+            if "$" in cashback:
+                cashback = "$"+ str(self.getNumbers(cashback))
+            elif "%" in cashback:
+                cashback = str(self.getNumbers(cashback)) + "%"
+            else:
+                pass
             item['cashback']    = cashback
-          #  item['cashback'] = [re.findall(pattern, c) for c in cash][0][0].replace("'", "''")
             item['sid']         = self.store_name
             item['ctype']       = 1
             item['numbers']     = self.getNumbers(cashback).replace('$', '').replace('%', '')
+            item['domainurl']   = self.base_url
             yield item
 
 

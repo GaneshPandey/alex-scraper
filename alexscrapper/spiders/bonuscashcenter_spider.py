@@ -26,7 +26,7 @@ class BonusCashCenter(CrawlSpider):
 
     start_urls =    ['https://www.bonuscashcenter.citicards.com/shopping/b____alpha.htm']
 
-    base_url = 'https://www.bonuscashcenter.com'
+    base_url = 'https://www.bonuscashcenter.citicards.com'
 
     headers = {
         'User-Agent': 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.10) Firefox/3.6.10 GTB7.1',
@@ -48,12 +48,22 @@ class BonusCashCenter(CrawlSpider):
 
 
     def parse_product(self, response):
+        li = response.xpath('//div[@class="mn_srchListSection"]/ul/li')
         item = Yaging()
-        for table in response.xpath('//div[@class="mn_srchListSection"]/ul/li'):
-            name            = table.xpath('tr/td[2]/table/tr/td/a/img/@alt').extract()
-            cash_data       = table.xpath('span/text()').extract()
-            cash           = [cash.split(' ')[0] for cash in cash_data]
-            item['link']    = [self.base_url+link for link in table.xpath('/a[2]/text()').extract()]
-            item['name']    = name
-            item['cashback'] = cash
+        for l in li:
+            name                = l.xpath('a[1]/text()').extract_first()
+            cashback            = l.xpath('span/text()').extract_first()
+            link                = l.xpath('a[2]/@href').extract_first().replace("../", "/")
+            item['link']        = self.base_url+str(link)
+            item['name']        = name.replace("'", "''")
+            item['cashback']    = cashback.replace("Cash Back", "").replace("'", "''")
+            item['ctype']       = 1
+            item['sid']         = self.store_name
+            item['numbers']     = self.getNumbers(cashback).replace('$', '').replace('%', '')
+            item['domainurl']   = self.base_url
             yield item
+
+    def getNumbers(self, cashback):
+        cash = cashback
+        pattern = r'\d+(?:\.\d+)?%|\$\d+(?:\.\d+)?'
+        return re.findall(pattern, cash)[0]

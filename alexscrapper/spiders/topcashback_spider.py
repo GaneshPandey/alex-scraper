@@ -18,26 +18,26 @@ import requests
 
 
 
-class MainStreetSharesSpider(CrawlSpider):
-    store_name = "MainStreet Shares"
-    name = "mainstreetshares"
+class TopCashBackSpider(CrawlSpider):
+    store_name = "Top Cash Back"
+    name = "topcashback"
 
-    allowed_domains = ["mainstreetshares.com"]
+    allowed_domains = ["topcashback.com"]
 
-    start_urls =    ['https://mainstreetshares.com/retailers.do']
+    start_urls =    ['http://www.topcashback.com/search/merchants/?letter=C&page=0']
 
-    base_url = 'https://mainstreetshares.com/'
+    base_url = 'https://topcashback.com'
 
     headers = {
         'User-Agent': 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.10) Firefox/3.6.10 GTB7.1',
         'Accept-Language': 'en-us,en;q=0.5'
     }
 
+    searchurls = 'http://www.topcashback.com/search/merchants/?letter={}'
     path = ['0','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
-
-
+    # path = ['z']
     def __init__(self, *args, **kwargs):
-        super(MainStreetSharesSpider, self).__init__(*args, **kwargs)
+        super(TopCashBackSpider, self).__init__(*args, **kwargs)
         settings.set('RETRY_HTTP_CODES', [500, 503, 504, 400, 408, 404] )
         settings.set('RETRY_TIMES', 5 )
         settings.set('REDIRECT_ENABLED', True)
@@ -47,20 +47,32 @@ class MainStreetSharesSpider(CrawlSpider):
 
     def start_requests(self):
         for p in self.path:
-            url = self.start_urls[0]+"?startsWith="+p
+            url = self.searchurls.format(p)
+            yield Request(url=url, callback=self.start_page, headers=self.headers)
+
+    def start_page(self, response):
+        page    = response.xpath('//div[@class="gecko-pagination"]/a/text()').extract()
+        if page:
+            for x in xrange(0,int(page[-4])):
+                url = response.url + "&page=" + str(x)
+                yield Request(url=url, callback=self.parse_product, headers=self.headers)
+        else:
+            url = response.url
             yield Request(url=url, callback=self.parse_product, headers=self.headers)
+
+
 
     def parse_product(self, response):
         item = Yaging()
-        pattern = ur'([\d.]+)'
-        store = response.xpath('//table/tbody/tr')
+        td_2 = response.xpath('//td[@class="gecko-col-description"]')
+        td_3 = response.xpath('//td[@class="gecko-btn-col-plus"]')
+        for x in xrange(0,len(td_2)):
+            name        = str(td_2[x].xpath('a/span/text()').extract_first())
+            link        = str(td_2[x].xpath('a/@href').extract_first())
+            cashback    = str(td_3[x].xpath('a/span/text()').extract_first())
 
-        for data in store:
-            name = str(data.xpath('td[2]/a/text()').extract()[0])
-            cashback = str(data.xpath('td/strong/text()').extract()[0])
-            link = str([self.base_url + link for link in data.xpath('td[2]/a/@href').extract()][0])
-            item['name']        = name.replace("'", "''")
-            item['link']        = link
+            item['name']        = name.replace("\r\n", "").replace("'", "''")
+            item['link']        = self.base_url + link
             item['cashback']    = cashback.replace("'", "''")
             item['sid']         = self.store_name
             item['ctype']       = 1
@@ -71,5 +83,9 @@ class MainStreetSharesSpider(CrawlSpider):
 
     def getNumbers(self, cashback):
         cash = cashback
-        pattern = r'\d+(?:\.\d+)?%|\$\d+(?:\.\d+)?'
-        return re.findall(pattern, cash)[0]
+        pattern = r'\d+(?:\.\d+)?'
+        ret =  re.findall(pattern, cash)
+        if len(ret):
+            return ret[0]
+        else:
+            return "0"

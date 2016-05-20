@@ -20,7 +20,7 @@ import requests
 
 class RebateBlastSpider(CrawlSpider):
     store_name = "Rebate Blast"
-    name = "RebateBlast"
+    name = "rebateBlast"
 
     allowed_domains = ["rebateblast.com"]
 
@@ -65,6 +65,7 @@ class RebateBlastSpider(CrawlSpider):
             item['sid']         = self.store_name
             item['ctype']       = 1
             item['numbers']     = self.getNumbers(cashback).replace('%', '').replace('$', '')
+            item['domainurl']   = self.base_url
             yield item
 
     def getNumbers(self, cashback):

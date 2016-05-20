@@ -131,6 +131,7 @@ class Yaging(scrapy.Item):
 	sid 		= scrapy.Field()
 	ctype 		= scrapy.Field()
 	numbers		= scrapy.Field()
+	domainurl 	= scrapy.Field()
 
 # class MileagePlanShopping(scrapy.Item):
 # 	link 		= scrapy.Field()

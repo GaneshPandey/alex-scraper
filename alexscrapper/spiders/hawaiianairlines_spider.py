@@ -19,7 +19,7 @@ import requests
 
 class HawaiiAnairLinesSpider(CrawlSpider):
     store_name = "Hawaiian Air Lines"
-    name = "hawaiianairines"
+    name = "hawaiianairlines"
 
     allowed_domains = ["hawaiianairines.com"]
 
@@ -33,10 +33,7 @@ class HawaiiAnairLinesSpider(CrawlSpider):
         'Accept-Encoding':'gzip, deflate, sdch',
         'Accept-Language':'en-US,en;q=0.8,hi;q=0.6,ar;q=0.4,ne;q=0.2,es;q=0.2',
         'Cache-Control':'max-age=0',
-        'Connection':'keep-alive',
-        'Cookie':'uuid=8f8365f0ea484d92824ce72fc3a2a828',
-        'Host':'nlocate.com',
-        'Upgrade-Insecure-Requests':'1'
+        'Connection':'keep-alive'
     }
 
 
@@ -59,7 +56,7 @@ class HawaiiAnairLinesSpider(CrawlSpider):
         
         for x in xrange(1,len(j['bs'])):
             name        = j['bs'][x]['n']
-            link      = j['bs'][x]['d']
+            link        = j['bs'][x]['d']
             cashback       = str(j['bs'][x]['c']) + " miles per " + str(j['bs'][x]['xs']) + j['bs'][x]['ct']
             item['name']        = name.replace("'", "''")
             item['link']        = link
@@ -67,6 +64,7 @@ class HawaiiAnairLinesSpider(CrawlSpider):
             item['sid']         = self.store_name
             item['ctype']       = 3
             item['numbers']     = self.getNumbers(cashback).replace('$', '').replace('%', '')
+            item['domainurl']   = self.base_url
             yield item
 
 
