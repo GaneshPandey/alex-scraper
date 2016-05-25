@@ -35,7 +35,7 @@ class TopCashBackSpider(CrawlSpider):
 
     searchurls = 'http://www.topcashback.com/search/merchants/?letter={}'
     path = ['0','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
-    # path = ['z']
+    # path = ['Z']
     def __init__(self, *args, **kwargs):
         super(TopCashBackSpider, self).__init__(*args, **kwargs)
         settings.set('RETRY_HTTP_CODES', [500, 503, 504, 400, 408, 404] )
@@ -52,12 +52,16 @@ class TopCashBackSpider(CrawlSpider):
 
     def start_page(self, response):
         page    = response.xpath('//div[@class="gecko-pagination"]/a/text()').extract()
-        if page:
-            for x in xrange(0,int(page[-4])):
+        a = ['1', '1', '1', '1']
+        page = a + page
+        if len(page)!=0:
+            for x in xrange(1,int(page[-4])+1):
                 url = response.url + "&page=" + str(x)
+                print url +"\n"
                 yield Request(url=url, callback=self.parse_product, headers=self.headers)
         else:
             url = response.url
+            print url
             yield Request(url=url, callback=self.parse_product, headers=self.headers)
 
 
@@ -67,9 +71,9 @@ class TopCashBackSpider(CrawlSpider):
         td_2 = response.xpath('//td[@class="gecko-col-description"]')
         td_3 = response.xpath('//td[@class="gecko-btn-col-plus"]')
         for x in xrange(0,len(td_2)):
-            name        = str(td_2[x].xpath('a/span/text()').extract_first())
-            link        = str(td_2[x].xpath('a/@href').extract_first())
-            cashback    = str(td_3[x].xpath('a/span/text()').extract_first())
+            name        = str(td_2[x].xpath('a/span/text()').extract_first().encode('utf-8'))
+            link        = str(td_2[x].xpath('a/@href').extract_first().encode('utf-8'))
+            cashback    = str(td_3[x].xpath('a/span/text()').extract_first().encode('utf-8'))
 
             item['name']        = name.replace("\r\n", "").replace("'", "''")
             item['link']        = self.base_url + link
