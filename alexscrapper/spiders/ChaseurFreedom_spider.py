@@ -64,7 +64,7 @@ class ChaseURFreedomSpider(CrawlSpider):
                 item['link']        = self.base_url + link
                 item['cashback']    = cashback.replace("'", "''")
                 item['sid']         = self.store_name
-                item['ctype']       = 1
+                item['ctype']       = 2
                 item['numbers']     = self.getNumbers(cashback).replace('%', '').replace('$', '')
                 item['domainurl']   = self.base_url
                 yield item
@@ -76,7 +76,7 @@ class ChaseURFreedomSpider(CrawlSpider):
                 item['link']        = self.base_url + link
                 item['cashback']    = cashback.replace("'", "''")
                 item['sid']         = self.store_name
-                item['ctype']       = 1
+                item['ctype']       = 2
                 item['numbers']     = self.getNumbers(cashback).replace('%', '').replace('$', '')
                 item['domainurl']   = self.base_url
                 yield item
